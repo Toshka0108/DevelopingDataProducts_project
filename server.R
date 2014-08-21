@@ -25,7 +25,7 @@ shinyServer(
                       c(testData$mpg[i], predictedValues[i]), col = "red" , lwd = 1)
             }
             
-            # add sigma of residuals on the plot
+            # add sigma_sq of residuals on the plot
             op <- round( sum((testData$mpg - predictedValues  )^2)/(length(predictedValues)-2),2)
             usr <- par('usr')
             text(usr[2]-50, usr[4] - 5, labels = paste("Sigma =",op) )
