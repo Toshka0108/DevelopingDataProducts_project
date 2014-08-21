@@ -1,13 +1,13 @@
 shinyServer(
     function(input, output) {
-        library("caret")
         output$plot <- renderPlot({
             
             # create two set of data (train/test) according to choosen proportion
             set.seed(input$seed)
-            edge <- createDataPartition(mtcars$mpg, p = input$proportion, list = F)
-            trainData <- allData[edge,]
-            testData <- allData[-edge,]
+            edge <- round(input$proportion*32,0)
+            edge <- sample(1:32,edge)
+            trainData <- mtcars[edge,]
+            testData <- mtcars[-edge,]
             
             # fit a regression model. mpg depends on disp
             fit <- lm(data = trainData, mpg ~ disp)
