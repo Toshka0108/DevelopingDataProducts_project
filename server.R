@@ -1,14 +1,13 @@
 shinyServer(
     function(input, output) {
-
+        library("caret")
         output$plot <- renderPlot({
             
             # create two set of data (train/test) according to choosen proportion
             set.seed(input$seed)
-            allData <- mtcars[sample(1:nrow(mtcars)),]
-            edge <- round(input$proportion*32,0)
-            trainData <- allData[1:edge,]
-            testData <- allData[-((edge+1):32),]
+            edge <- createDataPartition(mtcars$mpg, p = input$proportion, list = F)
+            trainData <- allData[edge,]
+            testData <- allData[-edge,]
             
             # fit a regression model. mpg depends on disp
             fit <- lm(data = trainData, mpg ~ disp)
@@ -18,8 +17,13 @@ shinyServer(
             
             # plot predicted values, actual values, residuals
             plot(  testData$disp, testData$mpg, xlab = "Disp", ylab = "Mpg", 
-                   col = 2, pch = 19  )
+                   col = 2, pch = 19 ,
+                   xlim = c( min(testData$disp) - 10,max(testData$disp) + 10),
+                   ylim = c(   min(testData$mpg,predictedValues) - 5, 
+                               max(testData$mpg,predictedValues) + 5    ))
+                               
             points( testData$disp, predictedValues, "l", lwd = 3 )
+            
             for (i in 1 : nrow(testData)) {
                 lines(c(testData$disp[i], testData$disp[i]),
                       c(testData$mpg[i], predictedValues[i]), col = "red" , lwd = 1)
